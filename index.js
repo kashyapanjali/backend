@@ -2,6 +2,7 @@ const express = require("express");
 const mongoDB = require("./db");
 const cors = require("cors"); // Import the cors module
 const user = require("./routes/users");
+const notes = require("./routes/notes");
 
 const app = express();
 app.use(cors()); // Use cors middleware
@@ -11,6 +12,7 @@ const PORT = 3000;
 mongoDB();
 
 app.use("/api/v1/users", user);
+app.use("/api/v1/notes", notes);
 
 //api test
 app.get("/api/v1/test", (req, res) => {
