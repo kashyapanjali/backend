@@ -22,17 +22,19 @@ const ValidateUser = [
 ];
 
 router.post("/", ValidateUser, async (req, res) => {
+	let success = false;
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
-		return res.status(400).json({ errors: errors.array() });
+		return res.status(400).json({ success, errors: errors.array() });
 	}
 
 	try {
 		let user = await User.findOne({ email: req.body.email });
 		if (user) {
-			return res
-				.status(400)
-				.json({ error: "Sorry a user with this email already exists" });
+			return res.status(400).json({
+				success,
+				error: "Sorry a user with this email already exists",
+			});
 		}
 
 		const salt = await bcrypt.genSalt(10);
@@ -53,8 +55,9 @@ router.post("/", ValidateUser, async (req, res) => {
 		};
 		const authToken = jwt.sign(data, JWT_SECRET);
 		console.log(authToken);
-
+		success = true;
 		res.status(201).json({
+			success,
 			message: "User created successfully",
 			authToken,
 		});
@@ -65,9 +68,12 @@ router.post("/", ValidateUser, async (req, res) => {
 });
 
 router.post("/login", [ValidateUser[1], ValidateUser[2]], async (req, res) => {
+	let success = false;
+
 	const errors = validationResult(req);
+
 	if (!errors.isEmpty()) {
-		return res.status(400).json({ errors: errors.array() });
+		return res.status(400).json({ success, errors: errors.array() });
 	}
 
 	const { email, password } = req.body;
@@ -75,7 +81,7 @@ router.post("/login", [ValidateUser[1], ValidateUser[2]], async (req, res) => {
 		let user = await User.findOne({ email });
 		if (!user) {
 			return res.status(400).json({
-				success: false,
+				success,
 				error: "Please try to login with correct credentials",
 			});
 		}
@@ -83,7 +89,7 @@ router.post("/login", [ValidateUser[1], ValidateUser[2]], async (req, res) => {
 		const passwordCompare = await bcrypt.compare(password, user.password);
 		if (!passwordCompare) {
 			return res.status(400).json({
-				success: false,
+				success,
 				error: "Please try to login with correct credentials",
 			});
 		}
@@ -94,11 +100,11 @@ router.post("/login", [ValidateUser[1], ValidateUser[2]], async (req, res) => {
 			},
 		};
 		const authToken = jwt.sign(data, JWT_SECRET);
-
-		res.json({ success: true, authToken, id: user.id, success });
+		success = true;
+		res.json({ success, authToken, id: user.id });
 	} catch (error) {
 		console.error(error.message);
-		res.status(500).json({ success: true, error: "Internal Server Error" });
+		res.status(500).json({ success: false, error: "Internal Server Error" });
 	}
 });
 
