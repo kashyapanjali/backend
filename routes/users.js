@@ -74,16 +74,18 @@ router.post("/login", [ValidateUser[1], ValidateUser[2]], async (req, res) => {
 	try {
 		let user = await User.findOne({ email });
 		if (!user) {
-			return res
-				.status(400)
-				.json({ error: "Please try to login with correct credentials" });
+			return res.status(400).json({
+				success: false,
+				error: "Please try to login with correct credentials",
+			});
 		}
 		//compare to correct password in db
 		const passwordCompare = await bcrypt.compare(password, user.password);
 		if (!passwordCompare) {
-			return res
-				.status(400)
-				.json({ error: "Please try to login with correct credentials" });
+			return res.status(400).json({
+				success: false,
+				error: "Please try to login with correct credentials",
+			});
 		}
 
 		const data = {
@@ -92,10 +94,11 @@ router.post("/login", [ValidateUser[1], ValidateUser[2]], async (req, res) => {
 			},
 		};
 		const authToken = jwt.sign(data, JWT_SECRET);
-		res.json({ authToken, id: user.id });
+
+		res.json({ success: true, authToken, id: user.id, success });
 	} catch (error) {
 		console.error(error.message);
-		res.status(500).send("Internal Server Error");
+		res.status(500).json({ success: true, error: "Internal Server Error" });
 	}
 });
 
