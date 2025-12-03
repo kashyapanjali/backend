@@ -7,7 +7,7 @@ const fetchUser = require("../middleware/auth");
 
 const router = express.Router();
 
-const JWT_SECRET = "INOTEBOOk@12345";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 //Add some validation rules by express-validator
 const ValidateUser = [
