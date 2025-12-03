@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const mongoDB = require("./db");
 const cors = require("cors"); // Import the cors module
 const user = require("./routes/users");
@@ -8,7 +9,7 @@ const app = express();
 app.use(cors()); // Use cors middleware
 app.use(express.json());
 
-const PORT = 3000;
+const PORT = process.env.PORT;
 mongoDB();
 
 app.use("/api/v1/users", user);

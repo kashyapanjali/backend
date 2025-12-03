@@ -54,7 +54,6 @@ router.post("/", ValidateUser, async (req, res) => {
 			},
 		};
 		const authToken = jwt.sign(data, JWT_SECRET);
-		console.log(authToken);
 		success = true;
 		res.status(201).json({
 			success,
